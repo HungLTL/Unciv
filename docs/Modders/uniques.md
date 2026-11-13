@@ -585,6 +585,8 @@ Simple unique parameters are explained by mouseover. Complex parameters are expl
 ??? example  "Gain [positiveAmount] Influence per turn with City-States you could demand tribute from"
 	Example: "Gain [3] Influence per turn with City-States you could demand tribute from"
 
+	This unique's effect can be modified with &lt;(modified by game speed)&gt;
+
 	Applicable to: Global
 
 ??? example  "Units are [relativeAmount]% more effective at intimidating City-States"

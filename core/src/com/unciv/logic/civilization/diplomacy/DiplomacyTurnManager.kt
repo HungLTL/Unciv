@@ -97,7 +97,7 @@ object DiplomacyTurnManager {
             && otherCiv.hasUnique(UniqueType.CityStateInfluenceGainWhenAfraid)) {
             var scaredInfluenceGain = 0.0f
             otherCiv.forEachMatchingUnique(UniqueType.CityStateInfluenceGainWhenAfraid) {
-                    unique -> scaredInfluenceGain += unique.params[0].toFloat()
+                    unique -> scaredInfluenceGain += unique.params[0].toFloat() * ( if (unique.isModifiedByGameSpeed()) otherCiv.gameInfo.speed.modifier else 1f)
             }
             addInfluence(scaredInfluenceGain)
         }

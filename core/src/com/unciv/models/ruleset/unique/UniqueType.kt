@@ -108,7 +108,7 @@ enum class UniqueType(
     CityStateResources("[relativeAmount]% resources gifted by City-States",  UniqueTarget.Global),
     CityStateLuxuryHappiness("[relativeAmount]% Happiness from luxury resources gifted by City-States", UniqueTarget.Global),
     CityStateInfluenceRecoversTwiceNormalRate("City-State Influence recovers at twice the normal rate", UniqueTarget.Global),
-    CityStateInfluenceGainWhenAfraid("Gain [positiveAmount] Influence per turn with City-States you could demand tribute from", UniqueTarget.Global),
+    CityStateInfluenceGainWhenAfraid("Gain [positiveAmount] Influence per turn with City-States you could demand tribute from", UniqueTarget.Global, flags = setOf(UniqueFlag.AcceptsSpeedModifier)),
     CityStateEasilyIntimidatedByForce("Units are [relativeAmount]% more effective at intimidating City-States", UniqueTarget.Global),
     // endregion
 
