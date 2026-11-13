@@ -123,7 +123,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
         onlineMultiplayer = Multiplayer()
 
-        Concurrency.run {
+        if (supportsOnlineMultiplayer) Concurrency.run {
             // Check if the server is available in case the feature set has changed
             try {
                 onlineMultiplayer.multiplayerServer.checkServerStatus()
@@ -197,8 +197,12 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
      *
      * Sets the returned `WorldScreen` as the only active screen.
      * @param autoPlay pass in the old WorldScreen AutoPlay to retain the state throughout turns. Otherwise leave it is the default.
+     * @param skipPlayerReadyScreen don't show the hotseat "Are you ready?" screen, e.g. when the same player continues after a reload
      */
-    suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false): WorldScreen = withThreadPoolContext toplevel@{
+    suspend fun loadGame(newGameInfo: GameInfo, autoPlay: AutoPlay = AutoPlay(settings.autoPlay), callFromLoadScreen: Boolean = false, skipPlayerReadyScreen: Boolean = false): WorldScreen = withThreadPoolContext toplevel@{
+        if (newGameInfo.gameParameters.isOnlineMultiplayer && !supportsOnlineMultiplayer)
+            throw UncivShowableException("Online multiplayer is unavailable in this browser preview.")
+
         val prevGameInfo = gameInfo
         gameInfo = newGameInfo
 
@@ -236,7 +240,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
 
             val moreThanOnePlayer = newGameInfo.civilizations.count { it.playerType == PlayerType.Human } > 1
             val isSingleplayer = !newGameInfo.gameParameters.isOnlineMultiplayer
-            val screenToShow = if (moreThanOnePlayer && isSingleplayer) {
+            val screenToShow = if (moreThanOnePlayer && isSingleplayer && !skipPlayerReadyScreen) {
                 PlayerReadyScreen(newWorldScreen)
             } else {
                 newWorldScreen
@@ -265,7 +269,7 @@ open class UncivGame(val isConsoleMode: Boolean = false) : Game(), PlatformSpeci
         val curGameInfo = gameInfo
         if (curWorldScreen == null || curGameInfo == null) return
 
-        loadGame(curGameInfo)
+        loadGame(curGameInfo, skipPlayerReadyScreen = true)
     }
 
     /**
@@ -495,11 +499,11 @@ private fun logRunningThreads() {
         pushScreen(onScreenCreated) { MainMenuScreen() }
     }
 
-    override fun getGcCount(): Int = ManagementFactory.getGarbageCollectorMXBeans().sumOf { it.collectionCount }.toInt()
+    override fun getGcCount(): Int? = ManagementFactory.getGarbageCollectorMXBeans().sumOf { it.collectionCount }.toInt()
 
     companion object {
         //region AUTOMATICALLY GENERATED VERSION DATA - DO NOT CHANGE THIS REGION, INCLUDING THIS COMMENT
-        val VERSION = Version("4.22.18", 1282)
+        val VERSION = Version("5.0.0", 1285)
         //endregion
 
         /** Global reference to the one Gdx.Game instance created by the platform launchers - do not use without checking [isCurrentInitialized] first. */
